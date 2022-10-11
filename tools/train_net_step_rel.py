@@ -167,6 +167,10 @@ def main():
         cfg.TRAIN.DATASETS = ('vg_train',)
         cfg.MODEL.NUM_CLASSES = 151
         cfg.MODEL.NUM_PRD_CLASSES = 50  # exclude background
+    elif args.dataset == "ag":
+        cfg.TRAIN.DATASETS = ('ag_train',)
+        cfg.MODEL.NUM_CLASSES = 37
+        cfg.MODEL.NUM_PRD_CLASSES = 26  # exclude background
     elif args.dataset == "oi_rel":
         cfg.TRAIN.DATASETS = ('oi_rel_train',)
         cfg.MODEL.NUM_CLASSES = 58
@@ -401,8 +405,7 @@ def main():
     ### Training Loop ###
     maskRCNN.train()
 
-    # CHECKPOINT_PERIOD = int(cfg.TRAIN.SNAPSHOT_ITERS / cfg.NUM_GPUS)
-    CHECKPOINT_PERIOD = cfg.SOLVER.MAX_ITER / cfg.TRAIN.SNAPSHOT_FREQ
+    CHECKPOINT_PERIOD = cfg.SOLVER.MAX_ITER // cfg.TRAIN.SNAPSHOT_FREQ
 
     # Set index for decay steps
     decay_steps_ind = None

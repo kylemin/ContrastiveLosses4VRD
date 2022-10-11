@@ -111,23 +111,23 @@ class Generalized_RCNN(nn.Module):
             self.RPN.dim_out, self.roi_feature_transform, self.Conv_Body.spatial_scale)
         self.Box_Outs = fast_rcnn_heads.fast_rcnn_outputs(
             self.Box_Head.dim_out)
-
+            
         self.Prd_RCNN = copy.deepcopy(self)
         del self.Prd_RCNN.RPN
         del self.Prd_RCNN.Box_Outs
-
-        # rel pyramid connection
+            
+         # rel pyramid connection
         if cfg.MODEL.USE_REL_PYRAMID:
             assert cfg.FPN.FPN_ON
             self.RelPyramid = rel_pyramid_module.rel_pyramid_module(self.num_roi_levels)
-
+        
         # RelPN
         self.RelPN = relpn_heads.generic_relpn_outputs()
         # RelDN
         self.RelDN = reldn_heads.reldn_head(self.Box_Head.dim_out * 3)
 
         self._init_modules()
-
+        
         # initialize S/O branches AFTER init_weigths so that weights can be automatically copied
         if cfg.MODEL.ADD_SO_SCORES:
             self.S_Head = copy.deepcopy(self.Box_Head)
@@ -256,14 +256,6 @@ class Generalized_RCNN(nn.Module):
             for p in to_be_deleted:
                 del checkpoint['model'][p]
             net_utils_rel.load_ckpt_rel(self.Prd_RCNN, checkpoint['model'])
-
-        def set_bn_eval(m):
-            classname = m.__class__.__name__
-            if classname.find('BatchNorm') != -1 or classname.find('bn') != -1:
-              m.eval()
-        
-        if cfg.TRAIN.EVA_BATCHNORM:
-            self.Conv_Body.apply(set_bn_eval)
     
     def load_detector_weights(self, weight_name):
         logger.info("loading pretrained weights from %s", weight_name)
@@ -274,10 +266,6 @@ class Generalized_RCNN(nn.Module):
             p.requires_grad = False
         for p in self.RPN.parameters():
             p.requires_grad = False
-
-        if cfg.RPN.FREEZE_RPN:
-            for p in self.RPN.parameters():
-                p.requires_grad = False
         if not cfg.MODEL.UNFREEZE_DET:
             for p in self.Box_Head.parameters():
                 p.requires_grad = False

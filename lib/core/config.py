@@ -178,6 +178,10 @@ __C.TRAIN.FREEZE_CONV_BODY = False
 __C.TRAIN.FREEZE_PRD_CONV_BODY = False
 __C.TRAIN.FREEZE_PRD_BOX_HEAD = False
 
+
+__C.TRAIN.EVA_BATCHNORM = True
+
+
 # ---------------------------------------------------------------------------- #
 # Data loader options
 # ---------------------------------------------------------------------------- #
@@ -757,6 +761,8 @@ __C.RPN.STRIDE = 16
 
 # RPN anchor aspect ratios
 __C.RPN.ASPECT_RATIOS = (0.5, 1, 2)
+
+__C.RPN.FREEZE_RPN = False
 
 
 # ---------------------------------------------------------------------------- #

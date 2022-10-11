@@ -121,6 +121,10 @@ if __name__ == '__main__':
         cfg.TEST.DATASETS = ('vg_val',)
         cfg.MODEL.NUM_CLASSES = 151
         cfg.MODEL.NUM_PRD_CLASSES = 50  # exclude background
+    elif args.dataset == "ag":
+        cfg.TEST.DATASETS = ('ag_val',)
+        cfg.MODEL.NUM_CLASSES = 37
+        cfg.MODEL.NUM_PRD_CLASSES = 26  # exclude background
     elif args.dataset == "vrd_train":
         cfg.TEST.DATASETS = ('vrd_train',)
         cfg.MODEL.NUM_CLASSES = 101
@@ -248,9 +252,9 @@ if __name__ == '__main__':
 
     assert_and_infer_cfg()
     
-    if not cfg.MODEL.RUN_BASELINE:
-        assert bool(args.load_ckpt) ^ bool(args.load_detectron), \
-            'Exactly one of --load_ckpt and --load_detectron should be specified.'
+    #if not cfg.MODEL.RUN_BASELINE:
+    #    assert bool(args.load_ckpt) ^ bool(args.load_detectron), \
+    #        'Exactly one of --load_ckpt and --load_detectron should be specified.'
     if args.output_dir is None:
         ckpt_path = args.load_ckpt if args.load_ckpt else args.load_detectron
         args.output_dir = os.path.join(
@@ -279,7 +283,7 @@ if __name__ == '__main__':
         with open(det_file, 'rb') as f:
             all_results = pickle.load(f)
         logger.info('Starting evaluation now...')
-        if args.dataset.find('vg') >= 0 or args.dataset.find('vrd') >= 0:
+        if args.dataset.find('vg') >= 0 or args.dataset.find('vrd') >= 0 or args.dataset.find('ag') >= 0:
             task_evaluation_vg_and_vrd.eval_rel_results(all_results, args.output_dir, args.topk, args.do_val)
         else:
             task_evaluation_sg.eval_rel_results(all_results, args.output_dir, args.topk, args.do_val, args.do_vis, args.do_special)

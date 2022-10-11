@@ -29,12 +29,14 @@ def eval_rel_results(all_results, output_dir, topk=100, do_val=True):
     
     if cfg.TEST.DATASETS[0].find('vg') >= 0:
         prd_k_set = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20)
+    elif cfg.TEST.DATASETS[0].find('ag') >= 0:
+        prd_k_set = (1, 6, 7, 10, 20)
     elif cfg.TEST.DATASETS[0].find('vrd') >= 0:
         prd_k_set = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 70)
     else:
         prd_k_set = (1, 2, 3, 4, 5, 6, 7, 8, 9)
         
-    if cfg.TEST.DATASETS[0].find('vg') >= 0:
+    if cfg.TEST.DATASETS[0].find('vg') >= 0 or cfg.TEST.DATASETS[0].find('ag') >= 0:
         eval_sets = (False,)
     else:
         eval_sets = (False, True)

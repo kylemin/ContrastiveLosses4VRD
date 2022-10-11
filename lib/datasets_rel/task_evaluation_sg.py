@@ -28,7 +28,7 @@ def eval_rel_results(all_results, output_dir, topk=100, do_val=True, do_vis=Fals
 
     print('topk: ', topk)
 
-    if cfg.TEST.DATASETS[0].find('vg') >= 0:
+    if cfg.TEST.DATASETS[0].find('vg') >= 0 or cfg.TEST.DATASETS[0].find('ag') >= 0:
         eval_per_img = True
         # eval_per_img = False
         prd_k = 1

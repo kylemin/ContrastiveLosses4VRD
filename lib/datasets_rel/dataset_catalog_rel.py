@@ -116,6 +116,27 @@ DATASETS = {
         ANN_FN3:
             _DATA_DIR + '/vg/predicates.json',
     },
+    # AG dataset
+    'ag_train': {
+        IM_DIR:
+            _DATA_DIR + '/ag/frames',
+        ANN_FN:
+            _DATA_DIR + '/ag/detections_train.json',
+        ANN_FN2:
+            _DATA_DIR + '/ag/rel_annotations_train.json',
+        ANN_FN3:
+            _DATA_DIR + '/ag/predicates.json',
+    },
+    'ag_val': {
+        IM_DIR:
+            _DATA_DIR + '/ag/frames',
+        ANN_FN:
+            _DATA_DIR + '/ag/detections_val.json',
+        ANN_FN2:
+            _DATA_DIR + '/ag/rel_annotations_val.json',
+        ANN_FN3:
+            _DATA_DIR + '/ag/predicates.json',
+    },
     # VRD dataset
     'vrd_train': {
         IM_DIR:
