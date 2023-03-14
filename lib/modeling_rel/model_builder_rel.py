@@ -359,8 +359,16 @@ class Generalized_RCNN(nn.Module):
                 im_scale = im_info.data.numpy()[:, 2][0]
                 im_w = im_info.data.numpy()[:, 1][0]
                 im_h = im_info.data.numpy()[:, 0][0]
-                sbj_boxes = roidb['sbj_gt_boxes']
-                obj_boxes = roidb['obj_gt_boxes']
+                sbj_boxes = roidb['sbj_gt_boxes'].copy()
+                obj_boxes = roidb['obj_gt_boxes'].copy()
+
+
+                pair_gt_boxes = np.concatenate((sbj_boxes, obj_boxes), axis=1).astype(np.int32)
+                pair_gt_boxes, pair_gt_index = np.unique(pair_gt_boxes, return_index=True, axis=0)
+                sbj_boxes = pair_gt_boxes[:, :4].astype(np.float32)
+                obj_boxes = pair_gt_boxes[:, 4:].astype(np.float32)
+
+
                 sbj_rois = sbj_boxes * im_scale
                 obj_rois = obj_boxes * im_scale
                 repeated_batch_idx = 0 * blob_utils.ones((sbj_rois.shape[0], 1))
@@ -391,6 +399,8 @@ class Generalized_RCNN(nn.Module):
                 if use_gt_labels:
                     sbj_labels = roidb['sbj_gt_classes']  # start from 0
                     obj_labels = roidb['obj_gt_classes']  # start from 0
+                    sbj_labels = sbj_labels[pair_gt_index]
+                    obj_labels = obj_labels[pair_gt_index]
                     sbj_scores = np.ones_like(sbj_labels, dtype=np.float32)
                     obj_scores = np.ones_like(obj_labels, dtype=np.float32)
                 else:
@@ -418,7 +428,7 @@ class Generalized_RCNN(nn.Module):
                 while score_thresh >= -1e-06:  # a negative value very close to 0.0
                     det_rois, det_labels, det_scores = \
                         self.prepare_det_rois(rpn_ret['rois'], cls_score, bbox_pred, im_info, score_thresh)
-                    rel_ret = self.RelPN(det_rois, det_labels, det_scores, im_info, dataset_name, roidb)
+                    rel_ret = self.RelPN(det_rois, det_labels, det_scores, im_info, dataset_name, roidb=None)
                     valid_len = len(rel_ret['rel_rois'])
                     if valid_len > 0:
                         break

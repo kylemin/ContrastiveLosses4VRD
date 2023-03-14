@@ -45,6 +45,15 @@ class single_scale_relpn_outputs(nn.Module):
         obj_inds = obj_inds[keeps]
         return sbj_inds, obj_inds
 
+    def sbj_adapt_remove_self_pairs(self, det_size, sbj_inds, obj_inds, person_inds):
+        mask = np.ones(sbj_inds.shape[0], dtype=bool)
+        for i in range(person_inds.shape[0]):
+            mask[person_inds[i] + det_size * i] = False
+        keeps = np.where(mask)[0]
+        sbj_inds = sbj_inds[keeps]
+        obj_inds = obj_inds[keeps]
+        return sbj_inds, obj_inds
+
     def forward(self, det_rois, det_labels, det_scores, im_info, dataset_name, roidb=None):
         """
         det_rois: feature maps from the backbone network. (Variable)
@@ -57,11 +66,21 @@ class single_scale_relpn_outputs(nn.Module):
             # we always feed one image per batch during training
             assert len(roidb) == 1
 
-        sbj_inds = np.repeat(np.arange(det_rois.shape[0]), det_rois.shape[0])
-        obj_inds = np.tile(np.arange(det_rois.shape[0]), det_rois.shape[0])
-        # remove self paired rois
-        if det_rois.shape[0] > 1:  # no pairs to remove when there is at most one detection
-            sbj_inds, obj_inds = self.remove_self_pairs(det_rois.shape[0], sbj_inds, obj_inds)
+
+        person_inds = np.where(det_labels <= 1)[0]
+        if not self.training and (dataset_name.find('ag') >= 0 and len(person_inds) > 0):
+            sbj_inds = np.repeat(person_inds, det_rois.shape[0])
+            obj_inds = np.tile(np.arange(det_rois.shape[0]), person_inds.shape[0])
+            if det_rois.shape[0] > 1:
+                sbj_inds, obj_inds = \
+                    self.sbj_adapt_remove_self_pairs(det_rois.shape[0], sbj_inds, obj_inds, person_inds)
+        else:
+            sbj_inds = np.repeat(np.arange(det_rois.shape[0]), det_rois.shape[0])
+            obj_inds = np.tile(np.arange(det_rois.shape[0]), det_rois.shape[0])
+            # remove self paired rois
+            if det_rois.shape[0] > 1:  # no pairs to remove when there is at most one detection
+                sbj_inds, obj_inds = self.remove_self_pairs(det_rois.shape[0], sbj_inds, obj_inds)
+
         sbj_rois = det_rois[sbj_inds]
         obj_rois = det_rois[obj_inds]
             

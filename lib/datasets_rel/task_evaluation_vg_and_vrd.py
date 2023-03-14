@@ -30,7 +30,9 @@ def eval_rel_results(all_results, output_dir, topk=100, do_val=True):
     if cfg.TEST.DATASETS[0].find('vg') >= 0:
         prd_k_set = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20)
     elif cfg.TEST.DATASETS[0].find('ag') >= 0:
-        prd_k_set = (1, 6, 7, 10, 20)
+        #prd_k_set = (1, 6, 7, 10, 20)
+        prd_k_set = (1,)
+        #prd_k_set = (7,)
     elif cfg.TEST.DATASETS[0].find('vrd') >= 0:
         prd_k_set = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 70)
     else:
@@ -48,7 +50,7 @@ def eval_rel_results(all_results, output_dir, topk=100, do_val=True):
         for prd_k in prd_k_set:
             print('prd_k = {}:'.format(prd_k))
 
-            recalls = {20: 0, 50: 0, 100: 0}
+            recalls = {10:0, 20: 0, 50: 0}
             if do_val:
                 all_gt_cnt = 0
 
